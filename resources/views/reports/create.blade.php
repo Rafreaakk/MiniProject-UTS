@@ -4,6 +4,48 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kirim Laporan</title>
+    <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 32px;
+                color: #1f2937;
+            }
+
+            form {
+                max-width: 520px;
+            }
+
+            label {
+                display: block;
+                margin: 16px 0 6px;
+                font-weight: 600;
+            }
+
+            input,
+            select,
+            textarea {
+                display: block;
+                box-sizing: border-box;
+                width: 100%;
+                padding: 9px;
+                font: inherit;
+            }
+
+            input[type="file"] {
+                padding: 4px 0;
+            }
+
+            textarea {
+                min-height: 110px;
+                resize: vertical;
+            }
+
+            button {
+                margin-top: 20px;
+                padding: 9px 16px;
+                font: inherit;
+            }
+</style>
 </head>
 <body>
     <h1>Kirim Laporan Kejadian</h1>
@@ -27,8 +69,6 @@
             <p>{{ $message }}</p>
         @enderror
 
-        <br><br>
-
         <label for="distribution_id">Distribusi makanan</label>
         <select id="distribution_id" name="distribution_id" required disabled>
             <option value="">Pilih sekolah terlebih dahulu</option>
@@ -36,8 +76,6 @@
         @error('distribution_id')
             <p>{{ $message }}</p>
         @enderror
-
-        <br><br>
 
         <label for="incident_at">Waktu kejadian</label>
         <input
@@ -51,8 +89,6 @@
             <p>{{ $message }}</p>
         @enderror
 
-        <br><br>
-
         <label for="description">Keterangan kejadian</label>
         <textarea
             id="description"
@@ -63,8 +99,6 @@
         @error('description')
             <p>{{ $message }}</p>
         @enderror
-
-        <br><br>
 
         <label for="people_affected">Jumlah orang yang mengalami keluhan</label>
         <input
@@ -80,9 +114,7 @@
             <p>{{ $message }}</p>
         @enderror
 
-        <br><br>
-
-        <label for="evidence">Bukti pendukung (opsional, maksimal 2 MB)</label>
+        <label for="evidence">Bukti pendukung (Maksimal 2 MB)</label>
         <input
             id="evidence"
             type="file"
@@ -92,9 +124,7 @@
         @error('evidence')
             <p>{{ $message }}</p>
         @enderror
-
-        <br><br>
-
+        
         <button type="submit">Kirim laporan</button>
     </form>
 

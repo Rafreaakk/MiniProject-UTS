@@ -8,18 +8,52 @@
 <body>
     <h1>Rekap Laporan MBG</h1>
 
-    <p>Total laporan: {{ $totalReports }}</p>
-    <p>Total orang terdampak: {{ $totalPeopleAffected }}</p>
+    <form method="GET" action="{{ route('reports.recap') }}">
+        <label for="school_id">Filter sekolah:</label>
+        <select id="school_id" name="school_id">
+            <option value="">Semua sekolah</option>
+            @foreach ($schools as $school)
+                <option
+                    value="{{ $school->id }}"
+                    @selected((string) $schoolId === (string) $school->id)
+                >
+                    {{ $school->name }}
+                </option>
+            @endforeach
+        </select>
+        <button type="submit">Terapkan filter</button>
+    </form>
 
-    <h2>Jumlah laporan berdasarkan status</h2>
-
+    <h2>Ringkasan</h2>
     <ul>
-        <li>Dikirim: {{ $reportsByStatus->get('dikirim', 0) }}</li>
-        <li>Sedang ditinjau: {{ $reportsByStatus->get('sedang_ditinjau', 0) }}</li>
-        <li>Perlu perbaikan: {{ $reportsByStatus->get('perlu_perbaikan', 0) }}</li>
-        <li>Diteruskan: {{ $reportsByStatus->get('diteruskan', 0) }}</li>
-        <li>Selesai: {{ $reportsByStatus->get('selesai', 0) }}</li>
+        <li>Total laporan: {{ $totalReports }}</li>
+        <li>Laporan masih diproses: {{ $reportsInProcess }}</li>
+        <li>Laporan selesai: {{ $reportsCompleted }}</li>
     </ul>
+
+    <h2>Rekap berdasarkan sekolah</h2>
+    <table border="1" cellpadding="6">
+        <thead>
+            <tr>
+                <th>Sekolah</th>
+                <th>Jumlah laporan</th>
+                <th>Jumlah orang terdampak</th>
+            </tr>
+        </thead>
+        <tbody>
+            @forelse ($schoolRecap as $row)
+                <tr>
+                    <td>{{ $row->name }}</td>
+                    <td>{{ $row->total_reports }}</td>
+                    <td>{{ $row->total_people_affected }}</td>
+                </tr>
+            @empty
+                <tr>
+                    <td colspan="3">Belum ada laporan untuk filter ini.</td>
+                </tr>
+            @endforelse
+        </tbody>
+    </table>
 
     <p><a href="{{ route('reports.index') }}">Kembali ke daftar laporan</a></p>
 </body>

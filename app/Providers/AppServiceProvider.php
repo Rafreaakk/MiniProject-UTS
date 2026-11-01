@@ -5,6 +5,8 @@ namespace App\Providers;
 use Illuminate\Support\ServiceProvider;
 use App\Models\User;
 use Illuminate\Support\Facades\Gate;
+use App\Models\Report;
+use App\Observers\ReportObserver;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -21,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Report::observe(ReportObserver::class);
+
         Gate::define(
             'submit-reports',
             fn (User $user): bool =>$user->role === 'pelapor'

@@ -130,20 +130,53 @@ class ReportController extends Controller
             ->response($report->evidence_path);
     }
 
-    public function recap()
+    public function recap(Request $request)
     {
-        $reportsByStatus = Report::query()
-            ->selectRaw('status, COUNT(*) as total')
-            ->groupBy('status')
-            ->pluck('total', 'status');
+        $filters = $request->validate([
+            'school_id' => ['nullable', 'integer', 'exists:schools,id'],
+        ]);
 
-        $totalReports = Report::count();
-        $totalPeopleAffected = Report::sum('people_affected');
+        $schoolId = $filters['school_id'] ?? null;
 
-        return view('reports.recap', compact (
-            'reportsByStatus',
+        $reports = Report::query()
+            ->when($schoolId, function ($query) use ($schoolId) {
+                $query->whereHas('distribution', function ($distribution) use ($schoolId) {
+                    $distribution->where('school_id', $schoolId);
+                });
+            });
+
+        $totalReports = (clone $reports)->count();
+
+        $reportsInProcess = (clone $reports)
+            ->where('status', '!=', 'selesai')
+            ->count();
+
+        $reportsCompleted = (clone $reports)
+            ->where('status', 'selesai')
+            ->count();
+
+        $schoolRecap = Report::query()
+            ->join('distributions', 'reports.distribution_id', '=', 'distributions.id')
+            ->join('schools', 'distributions.school_id', '=', 'schools.id')
+            ->when($schoolId, function ($query) use ($schoolId) {
+                $query->where('schools.id', $schoolId);
+            })
+            ->select('schools.id', 'schools.name')
+            ->selectRaw('COUNT(reports.id) as total_reports')
+            ->selectRaw('SUM(reports.people_affected) as total_people_affected')
+            ->groupBy('schools.id', 'schools.name')
+            ->orderBy('schools.name')
+            ->get();
+
+        $schools = School::orderBy('name')->get(['id', 'name']);
+
+        return view('reports.recap', compact(
+            'schools',
+            'schoolId',
             'totalReports',
-            'totalPeopleAffected'
+            'reportsInProcess',
+            'reportsCompleted',
+            'schoolRecap'
         ));
     }
 
