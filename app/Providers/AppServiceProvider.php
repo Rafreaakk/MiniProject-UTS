@@ -3,6 +3,8 @@
 namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
+use App\Models\User;
+use Illuminate\Support\Facades\Gate;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -19,6 +21,33 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        //
+        Gate::define(
+            'submit-reports',
+            fn (User $user): bool =>$user->role === 'pelapor'
+        );
+
+        Gate::define(
+        'review-reports',
+        fn (User $user): bool => $user->role === 'pemantau'
+        );
+
+        Gate::define(
+            'manage-supporting-data',
+            fn (User $user): bool => $user->role === 'koordinator'
+        );
+
+        Gate::define(
+            'record-forwarding',
+            fn (User $user): bool => $user->role === 'koordinator'
+        );
+
+        Gate::define(
+            'view-recap',
+            fn (User $user): bool => in_array(
+                $user->role,
+                ['pemantau', 'koordinator'],
+                true
+            )
+        );
     }
 }
